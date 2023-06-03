@@ -1,5 +1,5 @@
 variable "instance_type" {}
-variable "subnet_ids" {}
+variable "subnet_id" {}
 variable "name" {}
 variable "env" {}
 variable "vpc_id" {}
