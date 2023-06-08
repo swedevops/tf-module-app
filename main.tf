@@ -31,17 +31,19 @@ resource "aws_security_group" "sg" {
 }
 
 resource "aws_launch_template" "template" {
-  name_prefix   = "${var.name}-${var.env}-lt"
-  image_id      = data.aws_ami.ami.id
-  instance_type = var.instance_type
+  name_prefix            = "${var.name}-${var.env}-lt"
+  image_id               = data.aws_ami.ami.id
+  instance_type          = var.instance_type
   vpc_security_group_ids = [aws_security_group.sg.id]
-  iam_instance_profile    {
-     name = aws_iam_instance_profile.instance_profile.name
+  iam_instance_profile {
+    name = aws_iam_instance_profile.instance_profile.name
   }
+
   user_data = base64encode(templatefile("${path.module}/userdata.sh", {
-     name = var.name
-     env = var.env
+    name = var.name
+    env  = var.env
   }))
+
 }
 
 
