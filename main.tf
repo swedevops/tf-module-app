@@ -4,12 +4,11 @@ resource "aws_security_group" "sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    description      = "APP"
-    from_port        = var.app_port
-    to_port          = var.app_port
-    protocol         = "tcp"
-    cidr_blocks      = var.allow_app_cidr
-
+    description = "APP"
+    from_port   = var.app_port
+    to_port     = var.app_port
+    protocol    = "tcp"
+    cidr_blocks = var.allow_app_cidr
   }
 
   ingress {
@@ -19,6 +18,7 @@ resource "aws_security_group" "sg" {
     protocol    = "tcp"
     cidr_blocks = var.bastion_cidr
   }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -29,6 +29,7 @@ resource "aws_security_group" "sg" {
 
   tags = merge(var.tags, { Name = "${var.name}-${var.env}-sg" })
 }
+
 
 resource "aws_launch_template" "template" {
   name_prefix            = "${var.name}-${var.env}-lt"
@@ -46,27 +47,29 @@ resource "aws_launch_template" "template" {
 
 }
 
-
 resource "aws_autoscaling_group" "asg" {
-  name               = "${var.name}-${var.env}-asg"
-  desired_capacity   = var.desired_capacity
-  max_size           = var.max_size
-  min_size           = var.min_size
+  name                = "${var.name}-${var.env}-asg"
+  desired_capacity    = var.desired_capacity
+  max_size            = var.max_size
+  min_size            = var.min_size
   vpc_zone_identifier = var.subnet_ids
-  target_group_arns   = [ aws_lb_target_group.main.arn ]
+  target_group_arns   = [aws_lb_target_group.main.arn]
+
 
   launch_template {
     id      = aws_launch_template.template.id
     version = "$Latest"
   }
+
   dynamic "tag" {
     for_each = local.asg_tags
     content {
-      key = tag.key
+      key                 = tag.key
       propagate_at_launch = true
-      value = tag.value
+      value               = tag.value
     }
   }
+
 }
 
 resource "aws_lb_target_group" "main" {
@@ -74,7 +77,7 @@ resource "aws_lb_target_group" "main" {
   port     = var.app_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
-  tags = merge(var.tags, { Name = "${var.name}-${var.env}-tg" })
+  tags     = merge(var.tags, { Name = "${var.name}-${var.env}-tg" })
 }
 
 resource "aws_lb_listener_rule" "rule" {
@@ -100,9 +103,6 @@ resource "aws_route53_record" "main" {
   ttl     = 30
   records = [var.lb_dns_name]
 }
-
-
-
 
 
 
