@@ -97,6 +97,7 @@ resource "aws_lb_target_group" "main" {
   protocol = "HTTP"
   vpc_id   = var.vpc_id
   tags     = merge(var.tags, { Name = "${var.name}-${var.env}-tg" })
+  deregistration_delay = 30
 
   health_check {
     enabled = true
